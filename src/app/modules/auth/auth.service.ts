@@ -5,18 +5,19 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const signUp = async (payload: IAuth) => {
-    const { name, email, password } = payload;
+    console.log(payload);
+    const { name, email, password, role } = payload;
     const hashedPass = await bcrypt.hash(
         password,
         Number(config.BCRYPT_SALT_ROUND),
     );
     const result = await pool.query<IUser>(
         `
-            INSERT INTO users(name, email, password)
-            VALUES($1,$2,$3)
+            INSERT INTO users(name, email, password, role)
+            VALUES($1,$2,$3, COALESCE($4, 'contributor'))
             RETURNING *
         `,
-        [name, email, hashedPass],
+        [name, email, hashedPass, role],
     );
 
     const user = result.rows[0];
@@ -51,8 +52,14 @@ const login = async (payload: Partial<IAuth>) => {
         throw new Error("Invalid email or password");
     }
 
+    const jwtPayload = {
+        id: user.id,
+        name: user.name,
+        role: user.role,
+    };
+
     const generateToken = jwt.sign(
-        { id: user.id, name: user.name, role: user.role },
+        jwtPayload,
         config.JWT_SECRET as string,
         { expiresIn: "1d" },
     );

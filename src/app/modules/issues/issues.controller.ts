@@ -1,0 +1,64 @@
+import type { Request, Response } from "express";
+import { IssuesServices } from "./issues.service";
+import type { JwtPayload } from "jsonwebtoken";
+
+const createIssues = async (req: Request, res: Response) => {
+    try {
+        const result = await IssuesServices.createIssues(
+            req.body,
+            req.user as JwtPayload,
+        );
+        res.status(201).json({
+            success: true,
+            message: "Issues created successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            error: error,
+        });
+    }
+};
+
+const getAllIssues = async (req: Request, res: Response) => {
+    try {
+        const result = await IssuesServices.getAllIssues();
+        res.status(200).json({
+            success: true,
+            message: "Issue retrieved successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            error: error,
+        });
+    }
+};
+
+const getSingleIssue = async (req: Request, res: Response) => {
+    try {
+        const issueId = req.params.id as string;
+        const result = await IssuesServices.getSingleIssue(issueId);
+        res.status(200).json({
+            success: true,
+            message: "Issue retrieved successfully",
+            data: result,
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            error: error,
+        });
+    }
+};
+
+export const IssuesControllers = {
+    createIssues,
+    getAllIssues,
+    getSingleIssue,
+};

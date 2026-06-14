@@ -2,14 +2,15 @@ export interface IAuth {
     name: string;
     email: string;
     password: string;
+    role?: "contributor" | "maintainer";
 }
 
 export interface IUser {
-    id: string;
+    id: number;
     name: string;
     email: string;
     password: string;
     role: "contributor" | "maintainer";
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date;
+    updated_at: Date;
 }
