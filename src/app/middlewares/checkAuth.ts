@@ -6,7 +6,6 @@ import { pool } from "../../db";
 export const checkAuth =
     (...authRoles: any) =>
     async (req: Request, res: Response, next: NextFunction) => {
-        console.log(authRoles);
         const accessToken = req.headers.authorization;
         if (!accessToken) {
             throw new Error("You are not authorized");

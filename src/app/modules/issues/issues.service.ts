@@ -15,7 +15,6 @@ const createIssues = async (payload: IIssues, user: JwtPayload) => {
     );
 
     const issue = result.rows[0];
-    console.log(issue);
     return issue;
 };
 
@@ -43,7 +42,6 @@ const getAllIssues = async () => {
             [ids],
         );
         reporters = reportersResult.rows;
-        console.log(reporters);
     }
 
     const issuesWithReporter = issues.map((issue) => {
@@ -83,8 +81,76 @@ const getSingleIssue = async (id: string) => {
     return { ...rest, reporter, created_at, updated_at };
 };
 
+const updateIssue = async (
+    id: string,
+    payload: Partial<IIssues>,
+    user: JwtPayload,
+) => {
+    const issueResult = await pool.query(
+        `
+        SELECT * FROM issues WHERE id = $1
+        `,
+        [id],
+    );
+
+    const issue = issueResult.rows[0];
+    if (!issue) {
+        throw new Error("Issue not found");
+    }
+
+    if (user.role === "contributor") {
+        if (issue.reporter_id !== user.id) {
+            throw new Error("You can only update your own issue");
+        }
+        if (issue.status !== "open") {
+            throw new Error("You can only update issues with status open");
+        }
+    }
+
+    const { title, description, type } = payload;
+    const updatedResult = await pool.query<IIssues>(
+        `
+        UPDATE issues 
+        SET 
+            title = COALESCE($1, title),
+            description = COALESCE($2, description),
+            type = COALESCE($3, type),
+            updated_at = NOW()
+        WHERE id = $4
+        RETURNING *
+        `,
+        [title, description, type],
+    );
+
+    return updatedResult.rows[0];
+};
+
+const deleteIssue = async (id: string) => {
+    const issueResult = await pool.query<IIssues>(
+        `
+        SELECT * FROM issues WHERE id = $1
+        `,
+        [id],
+    );
+
+    const issue = issueResult.rows[0];
+
+    if (!issue) {
+        throw new Error("Issue not found");
+    }
+
+    await pool.query(
+        `
+        DELETE FROM issues WHERE id = $1
+        `,
+        [id],
+    );
+};
+
 export const IssuesServices = {
     createIssues,
     getAllIssues,
     getSingleIssue,
+    updateIssue,
+    deleteIssue,
 };
