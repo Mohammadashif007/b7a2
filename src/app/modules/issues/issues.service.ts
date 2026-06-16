@@ -15,6 +15,9 @@ const createIssues = async (payload: IIssues, user: JwtPayload) => {
     );
 
     const issue = result.rows[0];
+    if (!issue) {
+        throw new Error("Issue creation failed");
+    }
     return issue;
 };
 
@@ -119,10 +122,14 @@ const updateIssue = async (
         WHERE id = $4
         RETURNING *
         `,
-        [title, description, type],
+        [title, description, type, id],
     );
 
-    return updatedResult.rows[0];
+    const updatedIssue = updatedResult.rows[0];
+    if (!updatedIssue) {
+        throw new Error("Issue update failed");
+    }
+    return updatedIssue;
 };
 
 const deleteIssue = async (id: string) => {

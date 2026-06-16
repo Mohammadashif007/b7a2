@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { IssuesServices } from "./issues.service";
 import type { JwtPayload } from "jsonwebtoken";
+import sendResponse from "../../utility/sendResponse";
 
 const createIssues = async (req: Request, res: Response) => {
     try {
@@ -8,13 +9,16 @@ const createIssues = async (req: Request, res: Response) => {
             req.body,
             req.user as JwtPayload,
         );
-        res.status(201).json({
+
+        sendResponse(res, {
+            statusCode: 201,
             success: true,
             message: "Issues created successfully",
             data: result,
         });
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
             error: error,
@@ -82,12 +86,10 @@ const updateIssue = async (req: Request, res: Response) => {
 const deleteIssue = async (req: Request, res: Response) => {
     try {
         const issueId = req.params.id as string;
-        await IssuesServices.deleteIssue(
-            issueId
-        );
+        await IssuesServices.deleteIssue(issueId);
         res.status(200).json({
             success: true,
-            message: "Issue deleted successfully"
+            message: "Issue deleted successfully",
         });
     } catch (error: any) {
         res.status(500).json({
