@@ -21,10 +21,35 @@ const createIssues = async (payload: IIssues, user: JwtPayload) => {
     return issue;
 };
 
-const getAllIssues = async () => {
-    const result = await pool.query<IIssues>(`
-    SELECT * FROM issues;
-    `);
+const getAllIssues = async (sort?: string, type?: string, status?: string) => {
+    const sortOrder = sort === "oldest" ? "ASC" : "DESC";
+
+    const conditions: string[] = [];
+    const values: unknown[] = [];
+    let paramCount = 1;
+
+    if (type) {
+        conditions.push(`type = $${paramCount}`);
+        values.push(type);
+        paramCount++;
+    }
+
+    if (status) {
+        conditions.push(`status = $${paramCount}`);
+        values.push(status);
+        paramCount++;
+    }
+
+    const whereClause =
+        conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const result = await pool.query<IIssues>(
+        `
+    SELECT * FROM issues ${whereClause} ORDER BY created_at ${sortOrder};
+    `,
+        values,
+    );
+
     const issues = result.rows;
 
     if (issues.length === 0) {
@@ -111,6 +136,9 @@ const updateIssue = async (
     }
 
     const { title, description, type } = payload;
+
+    const status = user.role === "maintainer" ? payload.status : undefined;
+
     const updatedResult = await pool.query<IIssues>(
         `
         UPDATE issues 
@@ -118,11 +146,12 @@ const updateIssue = async (
             title = COALESCE($1, title),
             description = COALESCE($2, description),
             type = COALESCE($3, type),
+            status = COALESCE($4, status),
             updated_at = NOW()
-        WHERE id = $4
+        WHERE id = $5
         RETURNING *
         `,
-        [title, description, type, id],
+        [title, description, type, status, id],
     );
 
     const updatedIssue = updatedResult.rows[0];
