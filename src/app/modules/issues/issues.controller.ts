@@ -29,13 +29,15 @@ const createIssues = async (req: Request, res: Response) => {
 const getAllIssues = async (req: Request, res: Response) => {
     try {
         const result = await IssuesServices.getAllIssues();
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
-            message: "Issue retrieved successfully",
+            message: "Issue retrieve successfully",
             data: result,
         });
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
             error: error,
@@ -47,13 +49,15 @@ const getSingleIssue = async (req: Request, res: Response) => {
     try {
         const issueId = req.params.id as string;
         const result = await IssuesServices.getSingleIssue(issueId);
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             message: "Issue retrieved successfully",
             data: result,
         });
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
             error: error,
@@ -69,13 +73,16 @@ const updateIssue = async (req: Request, res: Response) => {
             req.body,
             req.user as JwtPayload,
         );
-        res.status(200).json({
+
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             message: "Issue updated successfully",
             data: result,
         });
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
             error: error,
@@ -87,12 +94,14 @@ const deleteIssue = async (req: Request, res: Response) => {
     try {
         const issueId = req.params.id as string;
         await IssuesServices.deleteIssue(issueId);
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: 200,
             success: true,
             message: "Issue deleted successfully",
         });
     } catch (error: any) {
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: 500,
             success: false,
             message: error.message,
             error: error,
