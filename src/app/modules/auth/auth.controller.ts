@@ -1,18 +1,21 @@
 import type { Request, Response } from "express";
 import { AuthServices } from "./auth.service";
+import sendResponse from "../../utility/sendResponse";
+import { StatusCodes } from "http-status-codes";
 
 const signUp = async (req: Request, res: Response) => {
     try {
         const authInfo = req.body;
         const result = await AuthServices.signUp(authInfo);
-        res.status(201).json({
+        sendResponse(res, {
+            statusCode: StatusCodes.CREATED,
             success: true,
             message: "User registered successfully",
             data: result,
         });
     } catch (error: any) {
-        res.status(500).json({
-            statusCode: 500,
+        sendResponse(res, {
+            statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
             error: error,
@@ -24,14 +27,15 @@ const login = async (req: Request, res: Response) => {
     try {
         const authInfo = req.body;
         const result = await AuthServices.login(authInfo);
-        res.status(200).json({
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
             success: true,
             message: "Login successful",
             data: result,
         });
     } catch (error: any) {
-        res.status(500).json({
-            statusCode: 500,
+        sendResponse(res, {
+            statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
             error: error,

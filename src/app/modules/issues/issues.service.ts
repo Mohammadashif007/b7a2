@@ -53,7 +53,7 @@ const getAllIssues = async (sort?: string, type?: string, status?: string) => {
     const issues = result.rows;
 
     if (issues.length === 0) {
-        return [];
+        throw new Error("Issue not found");
     }
 
     const reporterIds = issues.map((issue) => issue.reporter_id);

@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { IssuesServices } from "./issues.service";
 import type { JwtPayload } from "jsonwebtoken";
 import sendResponse from "../../utility/sendResponse";
+import { StatusCodes } from "http-status-codes";
 
 const createIssues = async (req: Request, res: Response) => {
     try {
@@ -11,7 +12,7 @@ const createIssues = async (req: Request, res: Response) => {
         );
 
         sendResponse(res, {
-            statusCode: 201,
+            statusCode: StatusCodes.CREATED,
             success: true,
             message: "Issues created successfully",
             data: result,
