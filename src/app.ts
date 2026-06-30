@@ -20,7 +20,7 @@ app.use("/api", router);
 app.use((req: Request, res: Response) => {
     res.status(404).json({
         success: false,
-        message: `Cannot ${req.method} ${req.url}`,
+        message: "API not found",
     });
 });
 

@@ -2,7 +2,8 @@ import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { config } from "../config";
 import { pool } from "../../db";
-
+import sendResponse from "../utility/sendResponse";
+import { StatusCodes } from "http-status-codes";
 
 export const checkAuth =
     (...authRoles: string[]) =>
@@ -10,8 +11,10 @@ export const checkAuth =
         try {
             const accessToken = req.headers.authorization;
             if (!accessToken) {
-                res.status(401).json({
+                
+                sendResponse(res, {
                     success: false,
+                    statusCode: StatusCodes.UNAUTHORIZED,
                     message: "You are not authorized",
                 });
                 return;
@@ -30,7 +33,12 @@ export const checkAuth =
             );
 
             if (userData.rows.length === 0) {
-                res.status(404).json({
+                // res.status(404).json({
+                //     success: false,
+                //     message: "User not found!",
+                // });
+                sendResponse(res, {
+                    statusCode: StatusCodes.UNAUTHORIZED,
                     success: false,
                     message: "User not found!",
                 });
@@ -40,9 +48,14 @@ export const checkAuth =
             const user = userData.rows[0];
 
             if (authRoles.length && !authRoles.includes(user.role)) {
-                res.status(403).json({
+                // res.status(403).json({
+                //     success: false,
+                //     message: "You are not authorized",
+                // });
+                sendResponse(res, {
+                    statusCode: StatusCodes.FORBIDDEN,
                     success: false,
-                    message: "Forbidden",
+                    message: "You are not authorized",
                 });
                 return;
             }
@@ -51,10 +64,11 @@ export const checkAuth =
 
             next();
         } catch (error: any) {
-            res.status(401).json({
+            sendResponse(res, {
+                statusCode: StatusCodes.BAD_REQUEST,
                 success: false,
                 message: "Invalid expired token",
-                error: error.message,
+                errors: error.message,
             });
         }
     };

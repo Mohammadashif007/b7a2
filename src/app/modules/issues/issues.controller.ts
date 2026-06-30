@@ -19,10 +19,10 @@ const createIssues = async (req: Request, res: Response) => {
         });
     } catch (error: any) {
         sendResponse(res, {
-            statusCode: 500,
+            statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };
@@ -36,17 +36,17 @@ const getAllIssues = async (req: Request, res: Response) => {
             status as string,
         );
         sendResponse(res, {
-            statusCode: 200,
+            statusCode: StatusCodes.OK,
             success: true,
             message: "Issue retrieve successfully",
             data: result,
         });
     } catch (error: any) {
         sendResponse(res, {
-            statusCode: 500,
+            statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };
@@ -56,17 +56,21 @@ const getSingleIssue = async (req: Request, res: Response) => {
         const issueId = req.params.id as string;
         const result = await IssuesServices.getSingleIssue(issueId);
         sendResponse(res, {
-            statusCode: 200,
+            statusCode: StatusCodes.OK,
             success: true,
             message: "Issue retrieved successfully",
             data: result,
         });
     } catch (error: any) {
+        const statusCode =
+            error.message === "Issue not found"
+                ? StatusCodes.NOT_FOUND
+                : StatusCodes.BAD_REQUEST;
         sendResponse(res, {
-            statusCode: 500,
+            statusCode: statusCode,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };
@@ -81,17 +85,17 @@ const updateIssue = async (req: Request, res: Response) => {
         );
 
         sendResponse(res, {
-            statusCode: 200,
+            statusCode: StatusCodes.OK,
             success: true,
             message: "Issue updated successfully",
             data: result,
         });
     } catch (error: any) {
         sendResponse(res, {
-            statusCode: 500,
+            statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };
@@ -101,16 +105,16 @@ const deleteIssue = async (req: Request, res: Response) => {
         const issueId = req.params.id as string;
         await IssuesServices.deleteIssue(issueId);
         sendResponse(res, {
-            statusCode: 200,
+            statusCode: StatusCodes.OK,
             success: true,
             message: "Issue deleted successfully",
         });
     } catch (error: any) {
         sendResponse(res, {
-            statusCode: 500,
+            statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };

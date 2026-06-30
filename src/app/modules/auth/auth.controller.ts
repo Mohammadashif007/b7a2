@@ -18,7 +18,7 @@ const signUp = async (req: Request, res: Response) => {
             statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };
@@ -38,7 +38,7 @@ const login = async (req: Request, res: Response) => {
             statusCode: StatusCodes.BAD_REQUEST,
             success: false,
             message: error.message,
-            error: error,
+            errors: error.message,
         });
     }
 };
