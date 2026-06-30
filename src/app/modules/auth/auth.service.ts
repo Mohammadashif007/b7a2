@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const signUp = async (payload: IAuth) => {
-    console.log(payload);
     const { name, email, password, role } = payload;
     const hashedPass = await bcrypt.hash(
         password,
