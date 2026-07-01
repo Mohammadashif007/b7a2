@@ -15,6 +15,10 @@ app.get("/", (req: Request, res: Response) => {
     res.send("Hello World!");
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use("/api", router);
 
 app.use((req: Request, res: Response) => {
